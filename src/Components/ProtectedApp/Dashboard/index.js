@@ -6,7 +6,7 @@ import { clearAppState, getState } from "../../../Utilities/useLocalStorage";
 
 const menuList = [
   { title: "Onboarding", url: "/dashboard/onboarding" },
-  { title: "Values", url: "/dashboard/values" },
+  { title: "Expenses", url: "/dashboard/expenses" },
   {
     title: "Settings",
     subItems: [

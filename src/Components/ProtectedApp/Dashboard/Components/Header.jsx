@@ -12,6 +12,7 @@ import {
   PopoverArrow,
   PopoverTrigger,
 } from "@chakra-ui/core";
+import SignOutButton from "./SignOutButton";
 
 export function Header() {
   return (
@@ -47,15 +48,7 @@ export function Header() {
             <PopoverContent width="100px" zIndex={4}>
               <PopoverArrow />
               <PopoverBody>
-                <Button
-                  fontSize="1rem"
-                  _hover={{ background: "transparent" }}
-                  fontWeight="normal"
-                  variant="ghost"
-                  //   onClick={logout}
-                >
-                  Log out
-                </Button>
+                <SignOutButton />
               </PopoverBody>
             </PopoverContent>
           </Popover>
