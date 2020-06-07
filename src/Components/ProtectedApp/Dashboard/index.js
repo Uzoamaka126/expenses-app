@@ -5,7 +5,7 @@ import { clearAppState, getState } from "../../../Utilities/useLocalStorage";
 
 
 const menuList = [
-  { title: "Onboarding", url: "/dashboard/home" },
+  { title: "Onboarding", url: "/dashboard/onboarding" },
   { title: "Values", url: "/dashboard/values" },
   {
     title: "Settings",
@@ -19,7 +19,10 @@ const menuList = [
 
 export function Dashboard({ firebase, children }) {
 
-  const { email } = getState() && getState();
+  // const { email } = getState() && getState();
+  const email = getState()?.email;
+  console.log(email);
+  // const email = 'Amaka';
   const[isLoading, setIsLoading] = React.useState(false)
 
   function onLogout() {

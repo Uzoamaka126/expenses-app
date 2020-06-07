@@ -20,7 +20,7 @@ export function Header() {
       // background="#e3e8ee"
       background="#fff"
       borderLeft="solid 1px rgba(0,0,0,.05)"
-      padding="0.625rem 0"
+      borderBottom="1px solid #eee"
     >
       <Flex justifyContent="flex-end">
         <Stack isInline spacing={2} alignItems="center" paddingRight="2rem">
@@ -52,7 +52,7 @@ export function Header() {
                   _hover={{ background: "transparent" }}
                   fontWeight="normal"
                   variant="ghost"
-                //   onClick={logout}
+                  //   onClick={logout}
                 >
                   Log out
                 </Button>

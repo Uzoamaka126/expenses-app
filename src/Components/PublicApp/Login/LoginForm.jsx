@@ -11,42 +11,48 @@ import {
   useToast,
 } from "@chakra-ui/core";
 import { ToastBox } from "../../ToastBox";
+import { setState } from "../../../Utilities/useLocalStorage";
 
 export function LoginForm({ firebase, history }) {
   const toast = useToast();
-
-  const [values, setValues] = React.useState({
+  const INITIAL_STATE = {
     email: "",
     password: "",
-  });
+  };
+  const [values, setValues] = React.useState({...INITIAL_STATE});
   const [submitError, setSubmitError] = React.useState("");
-
   const isInvalid = values.email === "" || values.password === "";
+  const [isLoading, setIsLoading] = React.useState(false);
 
   function handleChange(event) {
     setValues({ ...values, [event.target.name]: event.target.value });
   }
 
-  function handleSubmit(event) {
+  function handleSubmit(values) {
+    setIsLoading(true);
     const { email, password } = values;
     firebase
       .doSignInWithEmailAndPassword(email, password)
       .then((authUser) => {
-        setValues(values);
+        console.log(authUser);
+        setValues({ ...INITIAL_STATE });
+        const { email, uid, xa: token } = authUser.user;
+        setState({ email, uid, token })
+        setIsLoading(false);
         toast({
           position: "bottom-left",
           render: () => <ToastBox message="User created" />,
         });
-          history.push('/dashboard/home')
+          history.push('/dashboard/onboarding')
       })
       .catch((error) => {
-        setSubmitError(error);
+        setValues({ error })
+        setIsLoading(false);
         toast({
           position: "bottom-left",
-          render: () => <ToastBox message={submitError} />,
+          render: () => <ToastBox message={error.message} />,
         });
       });
-    event.preventDefault();
   }
 
   return (
@@ -54,7 +60,6 @@ export function LoginForm({ firebase, history }) {
       <Box>
         <Box width="100%" margin="0 auto" maxWidth="448px">
           <form
-            onSubmit={handleSubmit}
             style={{
               width: "100%",
               margin: "10rem auto 0",
@@ -101,6 +106,8 @@ export function LoginForm({ firebase, history }) {
                 border="none"
                 width="100%"
                 isDisabled={isInvalid}
+                isLoading={isLoading}
+                onClick={() => handleSubmit(values)}
               >
                 Login
               </Button>

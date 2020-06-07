@@ -37,7 +37,7 @@ export function Onboarding({ history }) {
 
   return (
     <Box>
-      <Box textAlign="left" marginY="2.5rem">
+      <Box textAlign="left" marginY="2.5rem" marginLeft="2rem">
         <Text fontSize="1.3rem" color="rgb(0, 54, 72)" fontWeight="semibold">
           Welcome to Expenses Tracker!
         </Text>

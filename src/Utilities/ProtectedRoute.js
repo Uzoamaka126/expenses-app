@@ -4,7 +4,6 @@ import { getToken } from "./useLocalStorage";
 
 const ProtectedRoute = ({ component: Component, ...props }) => {
   const token = getToken();
-  console.log(token);
   return (
     <Route
       {...props}

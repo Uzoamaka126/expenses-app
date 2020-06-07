@@ -14,7 +14,7 @@ import { ModalContainer } from "../../ModalContainer";
 
 export function SignupSuccess({ history, isOpen, onClose }) {
   function goToDashboard() {
-    history.push("/dashboard/home");
+    history.push("/dashboard/omboarding");
   }
 
   return (

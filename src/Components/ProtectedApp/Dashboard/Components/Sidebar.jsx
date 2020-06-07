@@ -52,8 +52,8 @@ export function SideBar({ menuList, username }) {
       backgroundColor="#e3e8ee"
       width="215px"
     >
-      <Box marginLeft="2.125rem" marginY="1rem">
-        <Text color="#1a1f36" fontSize="1.3rem" fontWeight="medium">
+      <Box marginLeft="1rem" marginY="1rem" >
+        <Text color="#1a1f36" fontSize="1rem" fontWeight="medium">
           {username}
         </Text>
       </Box>
