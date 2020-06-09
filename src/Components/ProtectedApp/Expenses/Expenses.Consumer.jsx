@@ -1,13 +1,27 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import app from "firebase/app";
 import { format } from "date-fns";
 import { Box, Flex, Text, Button, Stack } from "@chakra-ui/core";
-import { ExpensesContext, ExpensesTable } from "./index";
+import { ExpensesTable } from "./index";
 import { EmptyPage, PageHeader } from "../../index";
 import EmptyImage from "../../../assets/empty_page_2.svg";
 import { TableDropdown } from "./components/TableDropdown";
 import { TableRender } from "./Expenses.Table";
+import { getState } from "../../../Utilities/useLocalStorage";
 
-export function ExpensesConsumer(props) {
+export function ExpensesConsumer({ firebase, history }) {
+  // const[isLoading, setIsLoading] = useState(false);
+  const [expensesData, setExpensesData] = useState([]);
+  // const [isError, setIsError] = useState(null);
+
+  const { uid } = getState();
+
+  useEffect(() => {
+    if (uid) {
+      handleFetchExpenses(uid);
+    }
+  }, [uid]);
+
   function getTableActions(data) {
     const tableActions = [
       {
@@ -26,7 +40,27 @@ export function ExpensesConsumer(props) {
 
   function handleEditExpense(expense) {}
   function handleDeleteExpense(expense) {}
-  // function
+
+  function handleFetchExpenses(userId) {
+    // setIsLoading(true)
+    firebase
+      .doGetUserExpenses(userId)
+      .then((querySnapshot) => {
+        // setIsLoading(false);
+        console.log(querySnapshot);
+        querySnapshot.forEach((doc) => {
+          console.log(`${doc.id} => ${doc.data()}`);
+        });
+        // setExpensesData(querySnapshot);
+      })
+      .catch((error) => {
+        // setIsLoading(false);
+        // setIsError(true)
+        console.log(error);
+      })
+  }
+
+  function handleAddExpense(data) {}
 
   const columns = React.useMemo(
     () => [
@@ -40,7 +74,7 @@ export function ExpensesConsumer(props) {
         Cell: ({ row: { original } }) => (
           <>{original.amount ? original.amount : "-"}</>
         ),
-          },
+      },
       {
         Header: "Category",
         accessor: "category ",
@@ -77,53 +111,53 @@ export function ExpensesConsumer(props) {
   );
 
   return (
-    <ExpensesContext.Consumer>
-      {(value) => (
-        <Box>
-          <PageHeader title="Expenses">
-            <Stack
-              isInline
-              flexWrap="wrap"
-              alignItems="center"
-              spacing={[0, "0.5rem", "0.5rem", "0.5rem"]}
+    <Box>
+      {/* {(value) => ( */}
+      <Box>
+        <PageHeader title="Expenses">
+          <Stack
+            isInline
+            flexWrap="wrap"
+            alignItems="center"
+            spacing={[0, "0.5rem", "0.5rem", "0.5rem"]}
+          >
+            {/* A filter component should be here */}
+            <Button
+              size="sm"
+              // onClick={onOpen}
+              fontWeight="normal"
+              variantColor="purple"
+              width={["100%", "unset", "unset", "unset"]}
             >
-              {/* A filter component should be here */}
-              <Button
-                size="sm"
-                // onClick={onOpen}
-                fontWeight="normal"
-                variantColor="purple"
-                width={["100%", "unset", "unset", "unset"]}
-              >
-                Add new expense
-              </Button>
-            </Stack>
-          </PageHeader>
-          {!value?.expenses.length ? (
-            <EmptyPage
-              heading="You have no expenses"
-              subheading="Click the button below to create an expense"
-              image={EmptyImage}
-              imageSize="400px"
-              width="500px"
+              Add new expense
+            </Button>
+          </Stack>
+        </PageHeader>
+        {!expensesData.length ? (
+          <EmptyPage
+            heading="You have no expenses"
+            subheading="Click the button below to create an expense"
+            image={EmptyImage}
+            imageSize="400px"
+            width="500px"
             //   height="300px"
+          >
+            <Button
+              size="sm"
+              // onClick={onOpen}
+              fontWeight="normal"
+              variantColor="purple"
+              width={["100%", "unset", "unset", "unset"]}
             >
-              <Button
-                size="sm"
-                // onClick={onOpen}
-                fontWeight="normal"
-                variantColor="purple"
-                width={["100%", "unset", "unset", "unset"]}
-              >
-                Add new expense
-              </Button>
-            </EmptyPage>
-          ) : (
-            <ExpensesTable data={value.expenses} columns={columns} />
-          )}
-        </Box>
-      )}
-    </ExpensesContext.Consumer>
+              Add new expense
+            </Button>
+          </EmptyPage>
+        ) : (
+          <ExpensesTable data={expensesData} columns={columns} />
+        )}
+      </Box>
+      {/* )} */}
+    </Box>
   );
 }
 

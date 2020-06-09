@@ -1,5 +1,6 @@
 import app from "firebase/app";
 import "firebase/auth";
+import "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -17,6 +18,7 @@ class Firebase {
     app.initializeApp(firebaseConfig);
 
     this.auth = app.auth();
+    this.db = app.firestore();
   }
   // *** Auth API ***
   doCreateUserWithEmailAndPassword = (email, password) =>
@@ -25,12 +27,43 @@ class Firebase {
   doSignInWithEmailAndPassword = (email, password) =>
     this.auth.signInWithEmailAndPassword(email, password);
 
-  doGetCurrentUser = () =>
-    this.auth.currentUser; 
+  doGetCurrentUser = () => this.auth.currentUser;
   doSignOut = () => this.auth.signOut();
   doPasswordReset = (email) => this.auth.sendPasswordResetEmail(email);
   doPasswordUpdate = (password) =>
     this.auth.currentUser.updatePassword(password);
+
+  doCheckIfUserAuthStateChanges = (user) =>
+    this.auth.onAuthStateChanged((user) => {
+      if (user) {
+        // User is signed in.
+        const userObj = {
+          displayName: user.displayName,
+          email: user.email,
+          emailVerified: user.emailVerified,
+          photoURL: user.photoURL,
+          isAnonymous: user.isAnonymous,
+          uid: user.uid,
+          providerData: user.providerData,
+        };
+        return userObj;
+      } else {
+        // User is signed out.
+        console.log("user is signed out");
+      }
+    });
+
+  doGetUserExpenses = (userId) =>
+    this.db.collection("Expenses").where("userID", "==", `${userId}`).get();
+
+  // doAddUserExpense = (data) =>
+  //   this.db.settings({
+  //     timestampsInSnapshots: true,
+  //   });
+  //   this.db.collection("Expenses").add({
+  //     userID: data.uid,
+  //     name: data.name,
+  //   });
 }
 
 export default Firebase;
