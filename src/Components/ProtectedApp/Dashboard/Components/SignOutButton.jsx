@@ -10,7 +10,7 @@ function SignOutButton({ firebase }) {
         firebase.doSignOut()
         clearAppState();
     }
-
+ 
     return (
         <Button type="button" onClick={logout} fontSize="1rem"
             _hover={{ background: "transparent" }}
