@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from "react";
 import app from "firebase/app";
 import { format } from "date-fns";
-import { Box, Flex, Text, Button, Stack } from "@chakra-ui/core";
+import { Box, Flex, Text, Button, Stack, useDisclosure } from "@chakra-ui/core";
 import { ExpensesTable } from "./index";
 import { EmptyPage, PageHeader } from "../../index";
 import EmptyImage from "../../../assets/empty_page_2.svg";
 import { TableDropdown } from "./components/TableDropdown";
 import { TableRender } from "./Expenses.Table";
 import { getState } from "../../../Utilities/useLocalStorage";
+import { CreateNewExpenseModal } from "./components/AddNewExpenseModal";
 
 export function ExpensesConsumer({ firebase, history }) {
-  // const[isLoading, setIsLoading] = useState(false);
+  const[isLoading, setIsLoading] = useState(false);
   const [expensesData, setExpensesData] = useState([]);
-  // const [isError, setIsError] = useState(null);
+  const [isError, setIsError] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const { uid } = getState();
 
@@ -21,6 +23,8 @@ export function ExpensesConsumer({ firebase, history }) {
       handleFetchExpenses(uid);
     }
   }, [uid]);
+
+  console.log(expensesData);
 
   function getTableActions(data) {
     const tableActions = [
@@ -42,20 +46,17 @@ export function ExpensesConsumer({ firebase, history }) {
   function handleDeleteExpense(expense) {}
 
   function handleFetchExpenses(userId) {
-    // setIsLoading(true)
     firebase
       .doGetUserExpenses(userId)
-      .then((querySnapshot) => {
-        // setIsLoading(false);
-        console.log(querySnapshot);
-        querySnapshot.forEach((doc) => {
-          console.log(`${doc.id} => ${doc.data()}`);
-        });
-        // setExpensesData(querySnapshot);
+      .then((result) => {
+        console.log(result);
+        setExpensesData(result.docs.map(doc => ({
+          ...doc.data(),
+          id: doc.id
+        })))
       })
       .catch((error) => {
-        // setIsLoading(false);
-        // setIsError(true)
+        setIsError(true)
         console.log(error);
       })
   }
@@ -66,7 +67,7 @@ export function ExpensesConsumer({ firebase, history }) {
     () => [
       {
         Header: "Name",
-        accessor: "name",
+        accessor: "expenses_name",
       },
       {
         Header: "Amount",
@@ -77,9 +78,9 @@ export function ExpensesConsumer({ firebase, history }) {
       },
       {
         Header: "Category",
-        accessor: "category ",
+        accessor: "category_name ",
         Cell: ({ row: { original } }) => (
-          <>{original.category ? original.category : "-"}</>
+          <>{original.category_name ? original.category_name : "-"}</>
         ),
       },
       {
@@ -124,7 +125,7 @@ export function ExpensesConsumer({ firebase, history }) {
             {/* A filter component should be here */}
             <Button
               size="sm"
-              // onClick={onOpen}
+              onClick={onOpen}
               fontWeight="normal"
               variantColor="purple"
               width={["100%", "unset", "unset", "unset"]}
@@ -156,19 +157,16 @@ export function ExpensesConsumer({ firebase, history }) {
           <ExpensesTable data={expensesData} columns={columns} />
         )}
       </Box>
-      {/* )} */}
+     <CreateNewExpenseModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={handleAddExpense}
+        isLoading={isLoading}
+      />
     </Box>
   );
 }
 
-{
-  /* <CreateCampaignModal
-            isOpen={isOpen}
-            onClose={onClose}
-            onSubmit={handleAddCampaign}
-            isLoading={loading === "pending"}
-          /> */
-}
 {
   /* <ConfirmModal
             title="Delete campaign"
