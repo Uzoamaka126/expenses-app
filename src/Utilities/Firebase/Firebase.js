@@ -1,6 +1,7 @@
 import app from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
+import { format } from "date-fns";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -56,14 +57,18 @@ class Firebase {
   doGetUserExpenses = (userId) =>
     this.db.collection("Expenses").where("userID", "==", `${userId}`).get();
 
-  // doAddUserExpense = (data) =>
-  //   this.db.settings({
-  //     timestampsInSnapshots: true,
-  //   });
-  //   this.db.collection("Expenses").add({
-  //     userID: data.uid,
-  //     name: data.name,
-  //   });
+  doAddUserExpense = (data) =>
+    this.db.collection("Expenses").add({
+      userID: data.id,
+      expenses_name: data.name,
+      year: format(new Date(), "yyyy"),
+      month: format(new Date(), "MMMM"),
+      day: format(new Date(), "dd"),
+      amount: data.amount,
+      category_name: data.category,
+      vendor: data.vendor,
+      createdAt: new Date(),
+    });
 }
 
 export default Firebase;

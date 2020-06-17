@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import app from "firebase/app";
 import { format } from "date-fns";
-import { Box, Flex, Text, Button, Stack, useDisclosure } from "@chakra-ui/core";
+import { Box, Button, Stack, useDisclosure } from "@chakra-ui/core";
 import { ExpensesTable } from "./index";
 import { EmptyPage, PageHeader } from "../../index";
 import EmptyImage from "../../../assets/empty_page_2.svg";
@@ -11,7 +10,7 @@ import { getState } from "../../../Utilities/useLocalStorage";
 import { CreateNewExpenseModal } from "./components/AddNewExpenseModal";
 
 export function ExpensesConsumer({ firebase, history }) {
-  const[isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [expensesData, setExpensesData] = useState([]);
   const [isError, setIsError] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -22,6 +21,7 @@ export function ExpensesConsumer({ firebase, history }) {
     if (uid) {
       handleFetchExpenses(uid);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uid]);
 
   console.log(expensesData);
@@ -42,26 +42,42 @@ export function ExpensesConsumer({ firebase, history }) {
     return tableActions;
   }
 
-  function handleEditExpense(expense) {}
+  function handleEditExpense(expense) {
+    
+  }
   function handleDeleteExpense(expense) {}
 
   function handleFetchExpenses(userId) {
     firebase
       .doGetUserExpenses(userId)
       .then((result) => {
-        console.log(result);
-        setExpensesData(result.docs.map(doc => ({
-          ...doc.data(),
-          id: doc.id
-        })))
+        setExpensesData(
+          result.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+          }))
+        );
       })
       .catch((error) => {
-        setIsError(true)
+        setIsError(true);
         console.log(error);
-      })
+      });
   }
 
-  function handleAddExpense(data) {}
+  function handleAddExpense(data) {
+    setIsLoading(true);
+    firebase
+      .doAddUserExpense(data)
+      .then((result) => {
+        setIsLoading(false);
+        onClose();
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        setIsError(true);
+        console.log(error);
+      });
+  }
 
   const columns = React.useMemo(
     () => [
@@ -86,17 +102,24 @@ export function ExpensesConsumer({ firebase, history }) {
       {
         Header: "Date Created",
         accessor: "date",
-        // Cell: ({ row: { original } }) => (
-        //   <>
-        //     {format(new Date(original.createdDatetime), "dd MMM yyyy, hh:mm:a")}
-        //   </>
-        // ),
+        Cell: ({ row: { original } }) => (
+          <>
+            {original.createdAt
+              ? format(
+                  new Date(
+                    `${original.day}, ${original.month}, ${original.year}`
+                  ),
+                  "dd MMM yyyy"
+                )
+              : "-"}
+          </>
+        ),
       },
       {
         Header: "Description",
         accessor: "description",
         Cell: ({ row: { original } }) => (
-          <TableRender>{original.content ? original.content : "-"}</TableRender>
+          <TableRender>{original.vendor ? original.vendor : "-"}</TableRender>
         ),
       },
       {
@@ -115,25 +138,27 @@ export function ExpensesConsumer({ firebase, history }) {
     <Box>
       {/* {(value) => ( */}
       <Box>
-        <PageHeader title="Expenses">
-          <Stack
-            isInline
-            flexWrap="wrap"
-            alignItems="center"
-            spacing={[0, "0.5rem", "0.5rem", "0.5rem"]}
-          >
-            {/* A filter component should be here */}
-            <Button
-              size="sm"
-              onClick={onOpen}
-              fontWeight="normal"
-              variantColor="purple"
-              width={["100%", "unset", "unset", "unset"]}
+        {!!expensesData.length && (
+          <PageHeader title="Expenses">
+            <Stack
+              isInline
+              flexWrap="wrap"
+              alignItems="center"
+              spacing={[0, "0.5rem", "0.5rem", "0.5rem"]}
             >
-              Add new expense
-            </Button>
-          </Stack>
-        </PageHeader>
+              {/* A filter component should be here. Filter by vendor or month or year */}
+              <Button
+                size="sm"
+                onClick={onOpen}
+                fontWeight="normal"
+                variantColor="purple"
+                width={["100%", "unset", "unset", "unset"]}
+              >
+                Add new expense
+              </Button>
+            </Stack>
+          </PageHeader>
+        )}
         {!expensesData.length ? (
           <EmptyPage
             heading="You have no expenses"
@@ -141,7 +166,6 @@ export function ExpensesConsumer({ firebase, history }) {
             image={EmptyImage}
             imageSize="400px"
             width="500px"
-            //   height="300px"
           >
             <Button
               size="sm"
@@ -157,7 +181,7 @@ export function ExpensesConsumer({ firebase, history }) {
           <ExpensesTable data={expensesData} columns={columns} />
         )}
       </Box>
-     <CreateNewExpenseModal
+      <CreateNewExpenseModal
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={handleAddExpense}

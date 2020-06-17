@@ -34,7 +34,7 @@ export function TableDropdown({
         >
           <Icon
             top="4px"
-            name="more"
+            name="menu"
             size="0.875rem"
             position="relative"
           />
@@ -67,6 +67,7 @@ export function TableDropdown({
                       size="0.75rem"
                       color="#66788a"
                       icon={action.icon}
+                      // icon="menu"
                     />
                   </Box>
                 )}

@@ -15,6 +15,7 @@ import {
 } from "@chakra-ui/core";
 import React from "react";
 import { ModalContainer } from "../../../ModalContainer";
+import { getState } from "../../../../Utilities/useLocalStorage";
 
 const categories = [
   "Apps",
@@ -35,7 +36,9 @@ export function CreateNewExpenseModal({
   onSubmit,
   isLoading,
 }) {
+  const { uid } = getState();
   const [inputValue, setInputValue] = React.useState({
+    id: uid,
     name: "",
     category: "",
     amount: "",
@@ -46,17 +49,17 @@ export function CreateNewExpenseModal({
   const inputVendorRef = React.useRef(null);
   const inputAmountRef = React.useRef(null);
 
-  React.useEffect(() => {
-    if (inputNameRef.current) {
-      inputNameRef.current.focus();
-    } else if (inputCategoryRef.current) {
-      inputCategoryRef.current.focus();
-    } else if (inputVendorRef.current) {
-      inputVendorRef.current.focus();
-    } else if (inputAmountRef.current) {
-      inputAmountRef.current.focus();
-    }
-  }, []);
+  // React.useEffect(() => {
+  //   if (inputNameRef.current) {
+  //     inputNameRef.current.focus();
+  //   } else if (inputCategoryRef.current) {
+  //     inputCategoryRef.current.focus();
+  //   } else if (inputVendorRef.current) {
+  //     inputVendorRef.current.focus();
+  //   } else if (inputAmountRef.current) {
+  //     inputAmountRef.current.focus();
+  //   }
+  // }, []);
 
   function handleChange(event) {
     setInputValue({ ...inputValue, [event.target.name]: event.target.value });
@@ -80,33 +83,31 @@ export function CreateNewExpenseModal({
       </ModalHeader>
       <Divider />
       <ModalBody>
-        <Box>
-          <Text color="#212242" fontSize="0.875rem">
-            Record a new expense to keep track of your spending .
-          </Text>
-        </Box>
-        <Box marginTop="2rem" marginBottom="1rem">
-          <FormControl>
+        <Box marginTop="1rem" marginBottom="1rem">
+          <FormControl marginBottom="1rem">
             <FormLabel fontSize="0.875rem" marginBottom="0.2rem">
               Expense Name
             </FormLabel>
             <Input
               size="sm"
               type="text"
+              name="name"
               ref={inputNameRef}
               value={inputValue.name}
-              onChange={handleChange}
-              placeholder="Give your campaign a name â€¦"
+              onChange={event => handleChange(event)}
+              placeholder="What's the name of your expense?"
             />
           </FormControl>
-          <FormControl>
+          <FormControl marginBottom="1rem">
             <FormLabel fontSize="0.875rem" marginBottom="0.2rem">
               Expense Category
             </FormLabel>
             <Select
               placeholder="Select option"
+              name="category"
               value={inputValue.category}
               ref={inputCategoryRef}
+              onChange={event => handleChange(event)}
             >
               {categories.map((item, index) => (
                 <option value={item} key={index}>
@@ -115,30 +116,32 @@ export function CreateNewExpenseModal({
               ))}
             </Select>
           </FormControl>
-          <FormControl>
+          <FormControl marginBottom="1rem">
             <FormLabel fontSize="0.875rem" marginBottom="0.2rem">
               Expense Amount
             </FormLabel>
             <Input
               size="sm"
               type="text"
+              name="amount"
               ref={inputAmountRef}
               value={inputValue.amount}
-              onChange={handleChange}
-              placeholder="Give your campaign a name â€¦"
+              onChange={event => handleChange(event)}
+              placeholder="How much did you pay for on this item?"
             />
           </FormControl>
-          <FormControl>
+          <FormControl marginBottom="1rem">
             <FormLabel fontSize="0.875rem" marginBottom="0.2rem">
               Expense Vendor
             </FormLabel>
             <Input
               size="sm"
               type="text"
+              name="vendor"
               ref={inputVendorRef}
               value={inputValue.vendor}
-              onChange={handleChange}
-              placeholder="Give your campaign a name â€¦"
+              onChange={event => handleChange(event)}
+              placeholder="Who did you purchase this item from?"
             />
           </FormControl>
         </Box>
@@ -156,7 +159,7 @@ export function CreateNewExpenseModal({
             fontWeight="normal"
             isLoading={isLoading}
             isDisabled={!inputValue}
-            onClick={() => onSubmit({ inputValue })}
+            onClick={() => onSubmit(inputValue)}
           >
             Add
           </Button>

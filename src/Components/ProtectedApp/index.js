@@ -6,26 +6,27 @@ import ProtectedRoute from "../../Utilities/ProtectedRoute";
 import { FirebaseContext } from "../../Utilities/Firebase";
 import { NotFound } from "../ErrorPage";
 import { ExpensesContextProvider } from "./Expenses";
+import { PreloadedStateProvider } from '../PreloadedStateProvider'
 export default function ProtectedApp(props) {
   return (
     <FirebaseContext.Consumer>
       {(firebase) => (
-        <Dashboard firebase={firebase} {...props}>
-          <Switch>
-            <ProtectedRoute
-              path="/dashboard/onboarding"
-              // render={(props) => <Onboarding {...props} />}
-              component={Onboarding}
-            />
-            <ProtectedRoute
-              path="/dashboard/expenses"
-              component={ExpensesContextProvider}
-            />
-            <Route
-              component={NotFound}
-            />
-          </Switch>
-        </Dashboard>
+      <Dashboard {...props}>
+        <Switch>
+          <ProtectedRoute
+            path="/dashboard/onboarding"
+            // render={(props) => <Onboarding {...props} />}
+            component={Onboarding}
+          />
+          <ProtectedRoute
+            path="/dashboard/expenses"
+            component={ExpensesContextProvider}
+          />
+          <Route
+            component={NotFound}
+          />
+        </Switch>
+      </Dashboard>
       )}
     </FirebaseContext.Consumer>
   );
