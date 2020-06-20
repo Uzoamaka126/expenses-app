@@ -1,6 +1,6 @@
 import React from "react";
 import { Link as RouterLink } from "react-router-dom";
-import { Box, Text, Flex, Image, Link } from "@chakra-ui/core";
+import { Box, Text, Link } from "@chakra-ui/core";
 // import notfound from '../Components/assets/404.svg'
 
 export function NotFound({ location }) {

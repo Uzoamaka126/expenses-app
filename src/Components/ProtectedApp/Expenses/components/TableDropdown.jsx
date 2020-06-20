@@ -8,18 +8,35 @@ import {
   PopoverContent,
   PopoverTrigger,
   Stack,
-    Text,
-  Icon
-} from '@chakra-ui/core';
-import React from 'react';
+  Text,
+  Icon,
+} from "@chakra-ui/core";
+import React from "react";
 
 export function TableDropdown({
   data,
-  actions,
-  id
+  id,
+  handleEditExpense,
+  handleDeleteExpense,
+  firebase
 }) {
 
-  console.log(actions, id)
+  // function getTableActions(data) {
+    const tableActions = [
+      {
+        icon: "edit",
+        label: "Edit this expense",
+        onClick: () => handleEditExpense(id),
+      },
+      {
+        icon: "delete",
+        label: "Delete this expense",
+        onClick: () => handleDeleteExpense(id),
+      },
+    ];
+    // return tableActions;
+  // }
+
   return (
     <Popover usePortal placement="bottom-end">
       <PopoverTrigger>
@@ -35,23 +52,18 @@ export function TableDropdown({
           flexDirection="column"
           justifyContent="center"
         >
-          <Icon
-            top="4px"
-            name="menu"
-            size="0.875rem"
-            position="relative"
-          />
+          <Icon top="4px" name="menu" size="0.875rem" position="relative" />
         </Button>
       </PopoverTrigger>
       <PopoverContent zIndex={10000} maxWidth="180px">
         <List>
-          {actions.map((action, i) => (
+          {tableActions.map((action, i) => (
             <ListItem
               key={i}
               outline="none"
               cursor="pointer"
-              _hover={{ backgroundColor: 'gray.100' }}
-              onClick={() => action.onClick && action.onClick(data)}
+              _hover={{ backgroundColor: "gray.100" }}
+              onClick={() => action.onClick && action.onClick()}
             >
               <Stack
                 isInline
@@ -70,7 +82,6 @@ export function TableDropdown({
                       size="0.75rem"
                       color="#66788a"
                       icon={action.icon}
-                      // icon="menu"
                     />
                   </Box>
                 )}

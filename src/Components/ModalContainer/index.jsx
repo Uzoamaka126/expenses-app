@@ -3,7 +3,7 @@ import {
     Modal,
     ModalOverlay,
     ModalContent,
-    ModalHeader,
+    // ModalHeader,
     ModalCloseButton,
 } from "@chakra-ui/core";
 

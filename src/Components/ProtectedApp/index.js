@@ -6,7 +6,6 @@ import ProtectedRoute from "../../Utilities/ProtectedRoute";
 import { FirebaseContext } from "../../Utilities/Firebase";
 import { NotFound } from "../ErrorPage";
 import { ExpensesContextProvider } from "./Expenses";
-import { PreloadedStateProvider } from '../PreloadedStateProvider'
 export default function ProtectedApp(props) {
   return (
     <FirebaseContext.Consumer>

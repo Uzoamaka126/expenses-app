@@ -13,12 +13,10 @@ import { DeleteExpenseModal } from "./components/DeleteExpensesModal";
 
 export function ExpensesConsumer({ firebase, history }) {
   const [isLoading, setIsLoading] = useState(false);
+    const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [expensesData, setExpensesData] = useState([]);
-  const [isError, setIsError] = useState(null);
   const [onOpenDelete, setOnOpenDelete] = useState(false);
   const [onOpenEdit, setOnOpenEdit] = useState(false);
-  
-  
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
 
@@ -32,22 +30,6 @@ export function ExpensesConsumer({ firebase, history }) {
   }, [uid]);
 
   console.log(expensesData);
-
-  function getTableActions(data) {
-    const tableActions = [
-      {
-        icon: "edit",
-        label: "Edit this expense",
-        onClick: () => setOnOpenEdit(true),
-      },
-      {
-        icon: "delete",
-        label: "Delete this expense",
-        onClick: () => setOnOpenDelete(true),
-      },
-    ];
-    return tableActions;
-  }
 
   function closeDeleteModal() {
      setOnOpenDelete(false)
@@ -93,11 +75,15 @@ export function ExpensesConsumer({ firebase, history }) {
   }
 
   function handleDeleteExpense(id) {
-    setIsLoading(true);
+    setIsDeleteLoading(true);
     firebase
       .doDeleteUserExpense(id)
       .then(() => {
-        setIsLoading(false);
+        if (expensesData) {
+          const updatedArray = expensesData.filter(item => item.id !== id)
+          setExpensesData(updatedArray);
+        }
+        setIsDeleteLoading(false);
         toast({
           position: "bottom-left",
           render: () => <ToastBox message="Expense deleted" />,
@@ -105,7 +91,7 @@ export function ExpensesConsumer({ firebase, history }) {
         onClose();
       })
       .catch((error) => {
-        setIsLoading(false);
+        setIsDeleteLoading(false);
         toast({
           position: "bottom-left",
           render: () => <ToastBox message={error} />,
@@ -126,7 +112,6 @@ export function ExpensesConsumer({ firebase, history }) {
         );
       })
       .catch((error) => {
-        setIsError(true);
         console.log(error);
       });
   }
@@ -141,7 +126,6 @@ export function ExpensesConsumer({ firebase, history }) {
       })
       .catch((error) => {
         setIsLoading(false);
-        setIsError(true);
         console.log(error);
       });
   }
@@ -193,7 +177,14 @@ export function ExpensesConsumer({ firebase, history }) {
         Header: "",
         accessor: "actionButtons",
         Cell: ({ row: { original } }) => (
-          <TableDropdown data={original} id={original.id}  actions={getTableActions(original)} />
+          // <TableDropdown data={original} id={original.id}  actions={getTableActions(original.id)} />
+          <TableDropdown
+            data={original}
+            id={original.id}
+            handleDeleteExpense={handleDeleteExpense}
+            handleEditExpense={handleEditExpense}
+            firebase={firebase }
+          />
         ),
       },
     ],

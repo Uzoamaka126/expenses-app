@@ -75,7 +75,6 @@ class Firebase {
 
   doEditUserExpense = (data) => 
     this.db.collection('Expenses').doc(`${data.id}`).set({
-      userID: data.id,
       expenses_name: data.name,
       year: format(new Date(), "yyyy"),
       month: format(new Date(), "MMMM"),

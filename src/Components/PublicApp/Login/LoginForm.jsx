@@ -20,7 +20,6 @@ export function LoginForm({ firebase, history }) {
     password: "",
   };
   const [values, setValues] = React.useState({...INITIAL_STATE});
-  const [submitError, setSubmitError] = React.useState("");
   const isInvalid = values.email === "" || values.password === "";
   const [isLoading, setIsLoading] = React.useState(false);
 
