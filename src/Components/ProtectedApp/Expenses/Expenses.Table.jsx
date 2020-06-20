@@ -70,14 +70,15 @@ export function ExpensesTable({
        usePagination
      );
 
-    const {
-        page,
+     const {
+       page,
        getTableProps,
        getTableBodyProps,
        headerGroups,
        prepareRow,
      } = tableInstance;
 
+     console.log(tableInstance)
      return (
        <TableStyles>
          <table {...getTableProps()}>
@@ -93,18 +94,19 @@ export function ExpensesTable({
              ))}
            </thead>
            <tbody {...getTableBodyProps()}>
-             {page && page.map((row, i) => {
-               prepareRow(row);
-               return (
-                 <tr key={i} {...row.getRowProps()}>
-                   {row.cells.map((cell) => {
-                     return (
-                       <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
-                     );
-                   })}
-                 </tr>
-               );
-             })}
+             {page &&
+               page.map((row, i) => {
+                 prepareRow(row);
+                 return (
+                   <tr key={i} {...row.getRowProps()}>
+                     {row.cells.map((cell) => {
+                       return (
+                         <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                       );
+                     })}
+                   </tr>
+                 );
+               })}
            </tbody>
          </table>
          {/* Use Pagination here */}

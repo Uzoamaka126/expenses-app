@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { Box, Button, Stack, useDisclosure } from "@chakra-ui/core";
+import { Box, Button, Stack, useDisclosure, useToast } from "@chakra-ui/core";
 import { ExpensesTable } from "./index";
 import { EmptyPage, PageHeader } from "../../index";
 import EmptyImage from "../../../assets/empty_page_2.svg";
@@ -8,12 +8,19 @@ import { TableDropdown } from "./components/TableDropdown";
 import { TableRender } from "./Expenses.Table";
 import { getState } from "../../../Utilities/useLocalStorage";
 import { CreateNewExpenseModal } from "./components/AddNewExpenseModal";
+import { ToastBox } from "../../ToastBox";
+import { DeleteExpenseModal } from "./components/DeleteExpensesModal";
 
 export function ExpensesConsumer({ firebase, history }) {
   const [isLoading, setIsLoading] = useState(false);
   const [expensesData, setExpensesData] = useState([]);
   const [isError, setIsError] = useState(null);
+  const [onOpenDelete, setOnOpenDelete] = useState(false);
+  const [onOpenEdit, setOnOpenEdit] = useState(false);
+  
+  
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
 
   const { uid } = getState();
 
@@ -21,7 +28,7 @@ export function ExpensesConsumer({ firebase, history }) {
     if (uid) {
       handleFetchExpenses(uid);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uid]);
 
   console.log(expensesData);
@@ -31,21 +38,81 @@ export function ExpensesConsumer({ firebase, history }) {
       {
         icon: "edit",
         label: "Edit this expense",
-        onClick: (data) => handleEditExpense(data),
+        onClick: () => setOnOpenEdit(true),
       },
       {
         icon: "delete",
         label: "Delete this expense",
-        onClick: (data) => handleDeleteExpense(data),
+        onClick: () => setOnOpenDelete(true),
       },
     ];
     return tableActions;
   }
 
-  function handleEditExpense(expense) {
-    
+  function closeDeleteModal() {
+     setOnOpenDelete(false)
   }
-  function handleDeleteExpense(expense) {}
+  
+  function showModalEdit() {
+    setOnOpenEdit(true);
+  };
+
+  function hideModalEdit() {
+    setOnOpenEdit(false);
+  };
+
+  function getSingleExpense(id) {
+    setIsLoading(true);
+    firebase
+      .doGetSingleExpense(id)
+      .then(() => {
+        setIsLoading(false)
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        toast({
+          position: "bottom-left",
+          render: () => <ToastBox message={error} />,
+        });
+      });
+  }
+  function handleEditExpense(data) {
+    setIsLoading(true);
+    firebase
+      .doEditUserExpense(data)
+      .then((doc) => {
+        setIsLoading(false)
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        toast({
+          position: "bottom-left",
+          render: () => <ToastBox message={error} />,
+        });
+      });
+  }
+
+  function handleDeleteExpense(id) {
+    setIsLoading(true);
+    firebase
+      .doDeleteUserExpense(id)
+      .then(() => {
+        setIsLoading(false);
+        toast({
+          position: "bottom-left",
+          render: () => <ToastBox message="Expense deleted" />,
+        });
+        onClose();
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        toast({
+          position: "bottom-left",
+          render: () => <ToastBox message={error} />,
+        });
+        onClose();
+      });
+  }
 
   function handleFetchExpenses(userId) {
     firebase
@@ -126,7 +193,7 @@ export function ExpensesConsumer({ firebase, history }) {
         Header: "",
         accessor: "actionButtons",
         Cell: ({ row: { original } }) => (
-          <TableDropdown data={original} actions={getTableActions(original)} />
+          <TableDropdown data={original} id={original.id}  actions={getTableActions(original)} />
         ),
       },
     ],
@@ -187,16 +254,12 @@ export function ExpensesConsumer({ firebase, history }) {
         onSubmit={handleAddExpense}
         isLoading={isLoading}
       />
+      <DeleteExpenseModal
+        onOpenDelete={onOpenDelete}
+        onClose={closeDeleteModal}
+        onClick={handleDeleteExpense}
+        isLoading={isLoading}
+      />
     </Box>
   );
-}
-
-{
-  /* <ConfirmModal
-            title="Delete campaign"
-            isOpen={!!campaignToDelete}
-            onConfirm={handleCampaignDelete}
-            isLoading={loading === "pending"}
-            onClose={() => setCampaignToDelete(undefined)}
-          /> */
 }

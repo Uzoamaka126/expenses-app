@@ -16,7 +16,10 @@ import React from 'react';
 export function TableDropdown({
   data,
   actions,
+  id
 }) {
+
+  console.log(actions, id)
   return (
     <Popover usePortal placement="bottom-end">
       <PopoverTrigger>
