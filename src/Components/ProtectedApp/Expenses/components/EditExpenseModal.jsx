@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Box,
   Button,
@@ -6,145 +5,140 @@ import {
   FormControl,
   FormLabel,
   Input,
+  ModalBody,
+  ModalCloseButton,
+  ModalFooter,
+  ModalHeader,
   Stack,
   Select,
   Text,
+  Spinner,
 } from "@chakra-ui/core";
-import styled from "styled-components";
+import React from "react";
+import { ModalContainer } from "../../../ModalContainer";
+import { getState } from "../../../../Utilities/useLocalStorage";
 
-
-const Modal = styled.div`
-  .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid black;
-
-    &.display-block {
-      display: block;
-    }
-
-    &.display-none {
-      display: none;
-    }
-
-    .modal-main {
-      position: fixed;
-      background: white;
-      width: 80%;
-      height: auto;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-  }
-`;
-export function DeleteExpenseModal({ handleClose, onOpenDelete, children }) {
-  const showHideClassName = onOpenDelete
-    ? "modal display-block"
-    : "modal display-none";
-
+const categories = [
+  "Apps",
+  "Donations",
+  "Entertainment",
+  "Family & Friends",
+  "Food",
+  "Games",
+  "Media Subscriptions",
+  "Outings",
+  "Partners",
+  "Skincare",
+  "Transport",
+];
+export function EditExpenseModal({ isOpen, onClose, data, isLoading }) {
+  const { uid } = getState();
+  const { expenses_name, category_name, amount, vendor } = data;
   const [inputValue, setInputValue] = React.useState({
-    name: "",
-    category: "",
-    amount: "",
-    vendor: "",
+    id: uid,
+    name: expenses_name || "",
+    category: category_name || "",
+    amount: amount || "",
+    vendor: vendor || "",
   });
+  const [amountN, setAmountN] = React.useState(amount || 'kkk');
+  console.log(amountN, data, amount);
 
   const inputNameRef = React.useRef(null);
-  const inputCategoryRef = React.useRef(null);
-  const inputVendorRef = React.useRef(null);
-  const inputAmountRef = React.useRef(null);
 
-  React.useEffect(() => {
-    if (inputNameRef.current) {
-      inputNameRef.current.focus();
-    } else if (inputCategoryRef.current) {
-      inputCategoryRef.current.focus();
-    } else if (inputVendorRef.current) {
-      inputVendorRef.current.focus();
-    } else if (inputAmountRef.current) {
-      inputAmountRef.current.focus();
-    }
-  }, []);
+  function handleChange(event) {
+    setInputValue({ ...inputValue, [event.target.name]: event.target.value });
+  }
 
-  return (
-    <div className={showHideClassName}>
-      <Box>
+  return ( 
+    <ModalContainer
+      isOpen={isOpen}
+      onClose={onClose}
+      initialFocusRef={inputNameRef}
+    >
+      <ModalHeader>
         <Text fontSize="16px" fontWeight="semibold">
-          Create a new expense
+          Edit this expense
         </Text>
-      </Box>
+        <ModalCloseButton
+          color="#66788a"
+          fontSize="0.875rem"
+          _focus={{ border: "none" }}
+        />
+      </ModalHeader>
       <Divider />
-      <Box>
+      <ModalBody>
         <Box marginTop="1rem" marginBottom="1rem">
-          <FormControl marginBottom="1rem">
-            <FormLabel fontSize="0.875rem" marginBottom="0.2rem">
-              Expense Name
-            </FormLabel>
-            <Input
-              size="sm"
-              type="text"
-              name="name"
-              ref={inputNameRef}
-              value={inputValue.name}
-              onChange={(event) => handleChange(event)}
-              placeholder="What's the name of your expense?"
-            />
-          </FormControl>
-          <FormControl marginBottom="1rem">
-            <FormLabel fontSize="0.875rem" marginBottom="0.2rem">
-              Expense Category
-            </FormLabel>
-            <Select
-              placeholder="Select option"
-              name="category"
-              value={inputValue.category}
-              ref={inputCategoryRef}
-              onChange={(event) => handleChange(event)}
-            >
-              {categories.map((item, index) => (
-                <option value={item} key={index}>
-                  {item}
-                </option>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl marginBottom="1rem">
-            <FormLabel fontSize="0.875rem" marginBottom="0.2rem">
-              Expense Amount
-            </FormLabel>
-            <Input
-              size="sm"
-              type="text"
-              name="amount"
-              ref={inputAmountRef}
-              value={inputValue.amount}
-              onChange={(event) => handleChange(event)}
-              placeholder="How much did you pay for on this item?"
-            />
-          </FormControl>
-          <FormControl marginBottom="1rem">
-            <FormLabel fontSize="0.875rem" marginBottom="0.2rem">
-              Expense Vendor
-            </FormLabel>
-            <Input
-              size="sm"
-              type="text"
-              name="vendor"
-              ref={inputVendorRef}
-              value={inputValue.vendor}
-              onChange={(event) => handleChange(event)}
-              placeholder="Who did you purchase this item from?"
-            />
-          </FormControl>
+          {isLoading && data ? (
+            <Spinner />
+          ) : (
+            <>
+              <FormControl marginBottom="1rem">
+                <FormLabel fontSize="0.875rem" marginBottom="0.2rem">
+                  Expense Name
+                </FormLabel>
+                <Input
+                  size="sm"
+                  type="text"
+                  name="name"
+                  ref={inputNameRef}
+                  value={inputValue.name}
+                  onChange={(event) => handleChange(event)}
+                  placeholder="What's the name of your expense?"
+                />
+              </FormControl>
+              <FormControl marginBottom="1rem">
+                <FormLabel fontSize="0.875rem" marginBottom="0.2rem">
+                  Expense Category
+                </FormLabel>
+                <Select
+                  placeholder="Select option"
+                  name="category"
+                  value={inputValue.category}
+                  // ref={inputCategoryRef}
+                  onChange={(event) => handleChange(event)}
+                >
+                  {categories.map((item, index) => (
+                    <option value={item} key={index}>
+                      {item}
+                    </option>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl marginBottom="1rem">
+                <FormLabel fontSize="0.875rem" marginBottom="0.2rem">
+                  Expense Amount
+                </FormLabel>
+                <Input
+                  size="sm"
+                  type="text"
+                  name="amount"
+                  // ref={inputAmountRef}
+                  value={inputValue.amount}
+                  onChange={(event) => handleChange(event)}
+                  placeholder="How much did you pay for on this item?"
+                />
+              </FormControl>
+              <FormControl marginBottom="1rem">
+                <FormLabel fontSize="0.875rem" marginBottom="0.2rem">
+                  Expense Vendor
+                </FormLabel>
+                <Input
+                  size="sm"
+                  type="text"
+                  name="vendor"
+                  // ref={inputVendorRef}
+                  value={inputValue.vendor}
+                  onChange={(event) => handleChange(event)}
+                  placeholder="Who did you purchase this item from?"
+                />
+              </FormControl>
+            </>
+          )}
         </Box>
-      </Box>
+      </ModalBody>
       <Divider />
-      <Box>
+      <ModalFooter>
         <Stack isInline>
           <Button size="sm" onClick={onClose} fontWeight="normal">
             Cancel
@@ -156,12 +150,12 @@ export function DeleteExpenseModal({ handleClose, onOpenDelete, children }) {
             fontWeight="normal"
             isLoading={isLoading}
             isDisabled={!inputValue}
-            onClick={() => onSubmit(inputValue)}
+            // onClick={() => onSubmit(inputValue)}
           >
             Add
           </Button>
         </Stack>
-      </Box>
-    </div>
+      </ModalFooter>
+    </ModalContainer>
   );
 }

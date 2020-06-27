@@ -45,7 +45,7 @@ export function LoginForm({ firebase, history }) {
           history.push('/dashboard/onboarding')
       })
       .catch((error) => {
-        setValues({ error })
+        // setValues({ error })
         setIsLoading(false);
         toast({
           position: "bottom-left",

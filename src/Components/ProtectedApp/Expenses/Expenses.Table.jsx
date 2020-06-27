@@ -78,7 +78,7 @@ export function ExpensesTable({
        prepareRow,
      } = tableInstance;
 
-     console.log(tableInstance)
+    //  console.log(tableInstance)
      return (
        <TableStyles>
          <table {...getTableProps()}>

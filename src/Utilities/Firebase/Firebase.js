@@ -58,7 +58,7 @@ class Firebase {
     this.db.collection("Expenses").where("userID", "==", `${userId}`).get();
 
   doGetSingleExpense = (id) =>
-    this.db.collection('Expenses').doc(`${id}`)
+    this.db.doc(`/Expenses/${id}`).get();
 
   doAddUserExpense = (data) =>
     this.db.collection("Expenses").add({
@@ -74,7 +74,7 @@ class Firebase {
     });
 
   doEditUserExpense = (data) => 
-    this.db.collection('Expenses').doc(`${data.id}`).set({
+    this.db.doc(`/Expenses/${data.id}`).set({
       expenses_name: data.name,
       year: format(new Date(), "yyyy"),
       month: format(new Date(), "MMMM"),

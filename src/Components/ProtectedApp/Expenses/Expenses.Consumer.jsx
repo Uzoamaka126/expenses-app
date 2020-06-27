@@ -1,78 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { Box, Button, Stack, useDisclosure, useToast } from "@chakra-ui/core";
+import { Box, Button, useDisclosure, useToast } from "@chakra-ui/core";
 import { ExpensesTable } from "./index";
 import { EmptyPage, PageHeader } from "../../index";
 import EmptyImage from "../../../assets/empty_page_2.svg";
 import { TableDropdown } from "./components/TableDropdown";
 import { TableRender } from "./Expenses.Table";
 import { getState } from "../../../Utilities/useLocalStorage";
-import { CreateNewExpenseModal } from "./components/AddNewExpenseModal";
 import { ToastBox } from "../../ToastBox";
-import { DeleteExpenseModal } from "./components/DeleteExpensesModal";
-
 export function ExpensesConsumer({ firebase, history }) {
   const [isLoading, setIsLoading] = useState(false);
-    const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [expensesData, setExpensesData] = useState([]);
-  const [onOpenDelete, setOnOpenDelete] = useState(false);
-  const [onOpenEdit, setOnOpenEdit] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const toast = useToast();
 
   const { uid } = getState();
+  const toast = useToast();
 
   useEffect(() => {
     if (uid) {
       handleFetchExpenses(uid);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uid]);
 
   console.log(expensesData);
-
-  function closeDeleteModal() {
-     setOnOpenDelete(false)
-  }
-  
-  function showModalEdit() {
-    setOnOpenEdit(true);
-  };
-
-  function hideModalEdit() {
-    setOnOpenEdit(false);
-  };
-
-  function getSingleExpense(id) {
-    setIsLoading(true);
-    firebase
-      .doGetSingleExpense(id)
-      .then(() => {
-        setIsLoading(false)
-      })
-      .catch((error) => {
-        setIsLoading(false);
-        toast({
-          position: "bottom-left",
-          render: () => <ToastBox message={error} />,
-        });
-      });
-  }
-  function handleEditExpense(data) {
-    setIsLoading(true);
-    firebase
-      .doEditUserExpense(data)
-      .then((doc) => {
-        setIsLoading(false)
-      })
-      .catch((error) => {
-        setIsLoading(false);
-        toast({
-          position: "bottom-left",
-          render: () => <ToastBox message={error} />,
-        });
-      });
-  }
 
   function handleDeleteExpense(id) {
     setIsDeleteLoading(true);
@@ -80,7 +32,7 @@ export function ExpensesConsumer({ firebase, history }) {
       .doDeleteUserExpense(id)
       .then(() => {
         if (expensesData) {
-          const updatedArray = expensesData.filter(item => item.id !== id)
+          const updatedArray = expensesData.filter((item) => item.id !== id);
           setExpensesData(updatedArray);
         }
         setIsDeleteLoading(false);
@@ -101,6 +53,8 @@ export function ExpensesConsumer({ firebase, history }) {
   }
 
   function handleFetchExpenses(userId) {
+    setIsLoading(true);
+    console.log(isLoading)
     firebase
       .doGetUserExpenses(userId)
       .then((result) => {
@@ -110,6 +64,7 @@ export function ExpensesConsumer({ firebase, history }) {
             id: doc.id,
           }))
         );
+        setIsLoading(false)
       })
       .catch((error) => {
         console.log(error);
@@ -182,8 +137,12 @@ export function ExpensesConsumer({ firebase, history }) {
             data={original}
             id={original.id}
             handleDeleteExpense={handleDeleteExpense}
-            handleEditExpense={handleEditExpense}
-            firebase={firebase }
+            // handleEditExpense={handleEditExpense}
+            firebase={firebase}
+            onOpen={onOpen}
+            isOpen={isOpen}
+            onClose={onClose}
+            // singleExpenseData={singleExpenseData}
           />
         ),
       },
@@ -197,25 +156,11 @@ export function ExpensesConsumer({ firebase, history }) {
       {/* {(value) => ( */}
       <Box>
         {!!expensesData.length && (
-          <PageHeader title="Expenses">
-            <Stack
-              isInline
-              flexWrap="wrap"
-              alignItems="center"
-              spacing={[0, "0.5rem", "0.5rem", "0.5rem"]}
-            >
-              {/* A filter component should be here. Filter by vendor or month or year */}
-              <Button
-                size="sm"
-                onClick={onOpen}
-                fontWeight="normal"
-                variantColor="purple"
-                width={["100%", "unset", "unset", "unset"]}
-              >
-                Add new expense
-              </Button>
-            </Stack>
-          </PageHeader>
+          <PageHeader
+            handleAddExpense={handleAddExpense}
+            isLoading={isLoading}
+            // onClose={onClose}
+          />
         )}
         {!expensesData.length ? (
           <EmptyPage
@@ -239,18 +184,6 @@ export function ExpensesConsumer({ firebase, history }) {
           <ExpensesTable data={expensesData} columns={columns} />
         )}
       </Box>
-      <CreateNewExpenseModal
-        isOpen={isOpen}
-        onClose={onClose}
-        onSubmit={handleAddExpense}
-        isLoading={isLoading}
-      />
-      <DeleteExpenseModal
-        onOpenDelete={onOpenDelete}
-        onClose={closeDeleteModal}
-        onClick={handleDeleteExpense}
-        isLoading={isLoading}
-      />
     </Box>
   );
 }
