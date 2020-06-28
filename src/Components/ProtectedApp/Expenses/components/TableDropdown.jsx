@@ -17,30 +17,25 @@ import React, { useState } from "react";
 import { EditExpenseModal } from "./EditExpenseModal";
 import { ToastBox } from "../../../ToastBox";
 
-export function TableDropdown({
-  data,
-  id,
-  // handleEditExpense,
-  handleDeleteExpense,
-  firebase,
-  // onOpen,
-  // isOpen,
-  // onClose,
-  // singleExpenseData
-}) {
+export function TableDropdown({ data, id, handleDeleteExpense, firebase }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [singleExpenseData, setSingleExpenseData] = useState({});
+  const [expenseToEdit, setExpenseToEdit] = useState(data);
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  function getSingleExpense(id) {
+  function handleEditExpense(data) {
     setIsLoading(true);
-    onOpen();
     firebase
-      .doGetSingleExpense(id)
-      .then((result) => {
-        setSingleExpenseData(result.data());
+      .doEditUserExpense(data)
+      .then((doc) => {
+        console.log(doc);
         setIsLoading(false);
+        setExpenseToEdit(undefined);
+        toast({
+          position: "bottom-left",
+          render: () => <ToastBox message={"Expense has been edited"} />,
+        });
+        onClose();
       })
       .catch((error) => {
         setIsLoading(false);
@@ -51,28 +46,14 @@ export function TableDropdown({
       });
   }
 
-  function handleEditExpense(id) {
-    getSingleExpense(id);
-    // firebase
-    //   .doEditUserExpense(data)
-    //   .then((doc) => {
-    //     setIsLoading(false);
-    //   })
-    //   .catch((error) => {
-    //     setIsLoading(false);
-    //     toast({
-    //       position: "bottom-left",
-    //       render: () => <ToastBox message={error} />,
-    //     });
-    //   });
-  }
-
-  // function getTableActions(data) {
   const tableActions = [
     {
       icon: "edit",
       label: "Edit this expense",
-      onClick: () => handleEditExpense(id),
+      onClick: (data) => {
+        onOpen();
+        setExpenseToEdit(data);
+      },
     },
     {
       icon: "delete",
@@ -80,8 +61,6 @@ export function TableDropdown({
       onClick: () => handleDeleteExpense(id),
     },
   ];
-  // return tableActions;
-  // }
 
   return (
     <>
@@ -142,10 +121,14 @@ export function TableDropdown({
         </PopoverContent>
       </Popover>
       <EditExpenseModal
-        data={singleExpenseData}
+        data={expenseToEdit}
         isOpen={isOpen}
-        onClose={onClose}
+        onSubmit={handleEditExpense}
         isLoading={isLoading}
+        onClose={() => {
+          setExpenseToEdit(undefined);
+          onClose();
+        }}
       />
     </>
   );

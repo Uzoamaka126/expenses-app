@@ -14,7 +14,6 @@ export default function ProtectedApp(props) {
         <Switch>
           <ProtectedRoute
             path="/dashboard/onboarding"
-            // render={(props) => <Onboarding {...props} />}
             component={Onboarding}
           />
           <ProtectedRoute

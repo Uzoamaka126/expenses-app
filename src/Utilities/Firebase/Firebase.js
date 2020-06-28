@@ -49,7 +49,6 @@ class Firebase {
         };
         return userObj;
       } else {
-        // User is signed out.
         console.log("user is signed out");
       }
     });

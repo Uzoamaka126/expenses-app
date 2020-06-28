@@ -12,7 +12,6 @@ import {
   Stack,
   Select,
   Text,
-  Spinner,
 } from "@chakra-ui/core";
 import React from "react";
 import { ModalContainer } from "../../../ModalContainer";
@@ -31,26 +30,41 @@ const categories = [
   "Skincare",
   "Transport",
 ];
-export function EditExpenseModal({ isOpen, onClose, data, isLoading }) {
-  const { uid } = getState();
-  const { expenses_name, category_name, amount, vendor } = data;
-  const [inputValue, setInputValue] = React.useState({
-    id: uid,
-    name: expenses_name || "",
-    category: category_name || "",
-    amount: amount || "",
-    vendor: vendor || "",
+export function EditExpenseModal({
+  isOpen,
+  onClose,
+  data,
+  isLoading,
+  onSubmit,
+}) {
+  
+  const [inputValues, setInputValues] = React.useState({
+    id: "",
+    name: "",
+    category: "",
+    amount: "",
+    vendor: "",
   });
-  const [amountN, setAmountN] = React.useState(amount || 'kkk');
-  console.log(amountN, data, amount);
-
   const inputNameRef = React.useRef(null);
 
   function handleChange(event) {
-    setInputValue({ ...inputValue, [event.target.name]: event.target.value });
+    setInputValues({ ...inputValues, [event.target.name]: event.target.value });
   }
 
-  return ( 
+  React.useEffect(() => {
+    if (data) {
+      setInputValues({
+        ...inputValues,
+        id: data.id,
+        name: data.expenses_name,
+        category: data.category_name,
+        amount: data.amount,
+        vendor: data.vendor,
+      });
+    }
+  }, [data]);
+
+  return (
     <ModalContainer
       isOpen={isOpen}
       onClose={onClose}
@@ -69,72 +83,63 @@ export function EditExpenseModal({ isOpen, onClose, data, isLoading }) {
       <Divider />
       <ModalBody>
         <Box marginTop="1rem" marginBottom="1rem">
-          {isLoading && data ? (
-            <Spinner />
-          ) : (
-            <>
-              <FormControl marginBottom="1rem">
-                <FormLabel fontSize="0.875rem" marginBottom="0.2rem">
-                  Expense Name
-                </FormLabel>
-                <Input
-                  size="sm"
-                  type="text"
-                  name="name"
-                  ref={inputNameRef}
-                  value={inputValue.name}
-                  onChange={(event) => handleChange(event)}
-                  placeholder="What's the name of your expense?"
-                />
-              </FormControl>
-              <FormControl marginBottom="1rem">
-                <FormLabel fontSize="0.875rem" marginBottom="0.2rem">
-                  Expense Category
-                </FormLabel>
-                <Select
-                  placeholder="Select option"
-                  name="category"
-                  value={inputValue.category}
-                  // ref={inputCategoryRef}
-                  onChange={(event) => handleChange(event)}
-                >
-                  {categories.map((item, index) => (
-                    <option value={item} key={index}>
-                      {item}
-                    </option>
-                  ))}
-                </Select>
-              </FormControl>
-              <FormControl marginBottom="1rem">
-                <FormLabel fontSize="0.875rem" marginBottom="0.2rem">
-                  Expense Amount
-                </FormLabel>
-                <Input
-                  size="sm"
-                  type="text"
-                  name="amount"
-                  // ref={inputAmountRef}
-                  value={inputValue.amount}
-                  onChange={(event) => handleChange(event)}
-                  placeholder="How much did you pay for on this item?"
-                />
-              </FormControl>
-              <FormControl marginBottom="1rem">
-                <FormLabel fontSize="0.875rem" marginBottom="0.2rem">
-                  Expense Vendor
-                </FormLabel>
-                <Input
-                  size="sm"
-                  type="text"
-                  name="vendor"
-                  // ref={inputVendorRef}
-                  value={inputValue.vendor}
-                  onChange={(event) => handleChange(event)}
-                  placeholder="Who did you purchase this item from?"
-                />
-              </FormControl>
-            </>
-          )}
+          <FormControl marginBottom="1rem">
+            <FormLabel fontSize="0.875rem" marginBottom="0.2rem">
+              Expense Name
+            </FormLabel>
+            <Input
+              size="sm"
+              type="text"
+              name="name"
+              ref={inputNameRef}
+              value={inputValues.name}
+              onChange={(event) => handleChange(event)}
+              placeholder="What's the name of your expense?"
+            />
+          </FormControl>
+          <FormControl marginBottom="1rem">
+            <FormLabel fontSize="0.875rem" marginBottom="0.2rem">
+              Expense Category
+            </FormLabel>
+            <Select
+              placeholder="Select option"
+              name="category"
+              value={inputValues.category}
+              onChange={(event) => handleChange(event)}
+            >
+              {categories.map((item, index) => (
+                <option value={item} key={index}>
+                  {item}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl marginBottom="1rem">
+            <FormLabel fontSize="0.875rem" marginBottom="0.2rem">
+              Expense Amount
+            </FormLabel>
+            <Input
+              size="sm"
+              type="text"
+              name="amount"
+              value={inputValues.amount}
+              onChange={(event) => handleChange(event)}
+              placeholder="How much did you pay for on this item?"
+            />
+          </FormControl>
+          <FormControl marginBottom="1rem">
+            <FormLabel fontSize="0.875rem" marginBottom="0.2rem">
+              Expense Vendor
+            </FormLabel>
+            <Input
+              size="sm"
+              type="text"
+              name="vendor"
+              value={inputValues.vendor}
+              onChange={(event) => handleChange(event)}
+              placeholder="Who did you purchase this item from?"
+            />
+          </FormControl>
         </Box>
       </ModalBody>
       <Divider />
@@ -149,10 +154,10 @@ export function EditExpenseModal({ isOpen, onClose, data, isLoading }) {
             width={["100%", "unset", "unset", "unset"]}
             fontWeight="normal"
             isLoading={isLoading}
-            isDisabled={!inputValue}
-            // onClick={() => onSubmit(inputValue)}
+            isDisabled={!inputValues}
+            onClick={() => onSubmit(inputValues)}
           >
-            Add
+            Update
           </Button>
         </Stack>
       </ModalFooter>

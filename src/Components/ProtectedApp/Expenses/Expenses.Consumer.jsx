@@ -54,7 +54,6 @@ export function ExpensesConsumer({ firebase, history }) {
 
   function handleFetchExpenses(userId) {
     setIsLoading(true);
-    console.log(isLoading)
     firebase
       .doGetUserExpenses(userId)
       .then((result) => {
@@ -137,12 +136,7 @@ export function ExpensesConsumer({ firebase, history }) {
             data={original}
             id={original.id}
             handleDeleteExpense={handleDeleteExpense}
-            // handleEditExpense={handleEditExpense}
             firebase={firebase}
-            onOpen={onOpen}
-            isOpen={isOpen}
-            onClose={onClose}
-            // singleExpenseData={singleExpenseData}
           />
         ),
       },
@@ -153,13 +147,11 @@ export function ExpensesConsumer({ firebase, history }) {
 
   return (
     <Box>
-      {/* {(value) => ( */}
       <Box>
         {!!expensesData.length && (
           <PageHeader
             handleAddExpense={handleAddExpense}
             isLoading={isLoading}
-            // onClose={onClose}
           />
         )}
         {!expensesData.length ? (
@@ -172,7 +164,6 @@ export function ExpensesConsumer({ firebase, history }) {
           >
             <Button
               size="sm"
-              // onClick={onOpen}
               fontWeight="normal"
               variantColor="purple"
               width={["100%", "unset", "unset", "unset"]}
