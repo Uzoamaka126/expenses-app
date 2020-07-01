@@ -37,6 +37,7 @@ export function TableDropdown({ data, id, handleDeleteExpense, firebase, handleF
           render: () => <ToastBox message={"Expense has been edited"} />,
         });
         onClose();
+        handleFetchExpenses(uid);
       })
       .catch((error) => {
         setIsLoading(false);
