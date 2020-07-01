@@ -19,10 +19,7 @@ const menuList = [
 
 export function Dashboard({ firebase, children }) {
 
-  // const { email } = getState() && getState();
   const email = getState()?.email;
-  console.log(email);
-  // const email = 'Amaka';
   const[isLoading, setIsLoading] = React.useState(false)
 
   function onLogout() {

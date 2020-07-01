@@ -72,8 +72,9 @@ class Firebase {
       createdAt: new Date(),
     });
 
-  doEditUserExpense = (data) => 
+  doEditUserExpense = (data, id) => 
     this.db.doc(`/Expenses/${data.id}`).set({
+      userID: id,
       expenses_name: data.name,
       year: format(new Date(), "yyyy"),
       month: format(new Date(), "MMMM"),

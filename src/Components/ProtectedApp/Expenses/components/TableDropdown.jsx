@@ -16,19 +16,20 @@ import {
 import React, { useState } from "react";
 import { EditExpenseModal } from "./EditExpenseModal";
 import { ToastBox } from "../../../ToastBox";
+import { getState } from "../../../../Utilities/useLocalStorage";
 
-export function TableDropdown({ data, id, handleDeleteExpense, firebase }) {
+export function TableDropdown({ data, id, handleDeleteExpense, firebase, handleFetchExpenses }) {
   const [isLoading, setIsLoading] = useState(false);
   const [expenseToEdit, setExpenseToEdit] = useState(data);
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { uid } = getState();
 
   function handleEditExpense(data) {
     setIsLoading(true);
     firebase
-      .doEditUserExpense(data)
+      .doEditUserExpense(data, uid)
       .then((doc) => {
-        console.log(doc);
         setIsLoading(false);
         setExpenseToEdit(undefined);
         toast({

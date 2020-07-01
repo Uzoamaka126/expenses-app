@@ -8,11 +8,14 @@ import { TableDropdown } from "./components/TableDropdown";
 import { TableRender } from "./Expenses.Table";
 import { getState } from "../../../Utilities/useLocalStorage";
 import { ToastBox } from "../../ToastBox";
+import { FullPageSpinner } from "../../FullPageSpinner";
 export function ExpensesConsumer({ firebase, history }) {
   const [isLoading, setIsLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(false);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [expensesData, setExpensesData] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [add, setAdd] = useState({});
 
   const { uid } = getState();
   const toast = useToast();
@@ -36,6 +39,7 @@ export function ExpensesConsumer({ firebase, history }) {
           setExpensesData(updatedArray);
         }
         setIsDeleteLoading(false);
+        handleFetchExpenses(uid)
         toast({
           position: "bottom-left",
           render: () => <ToastBox message="Expense deleted" />,
@@ -53,7 +57,7 @@ export function ExpensesConsumer({ firebase, history }) {
   }
 
   function handleFetchExpenses(userId) {
-    setIsLoading(true);
+    setFetchLoading(true);
     firebase
       .doGetUserExpenses(userId)
       .then((result) => {
@@ -63,9 +67,10 @@ export function ExpensesConsumer({ firebase, history }) {
             id: doc.id,
           }))
         );
-        setIsLoading(false)
+        setFetchLoading(false);
       })
       .catch((error) => {
+        setFetchLoading(false);
         console.log(error);
       });
   }
@@ -75,8 +80,11 @@ export function ExpensesConsumer({ firebase, history }) {
     firebase
       .doAddUserExpense(data)
       .then((result) => {
+        setAdd(result);
+        console.log(add);
         setIsLoading(false);
         onClose();
+        handleFetchExpenses(uid);
       })
       .catch((error) => {
         setIsLoading(false);
@@ -137,6 +145,7 @@ export function ExpensesConsumer({ firebase, history }) {
             id={original.id}
             handleDeleteExpense={handleDeleteExpense}
             firebase={firebase}
+            handleFetchExpenses={handleFetchExpenses}
           />
         ),
       },
@@ -144,6 +153,10 @@ export function ExpensesConsumer({ firebase, history }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
+
+  if (fetchLoading) {
+    return <FullPageSpinner />;
+  }
 
   return (
     <Box>
