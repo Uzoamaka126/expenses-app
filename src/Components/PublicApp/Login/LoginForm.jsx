@@ -117,7 +117,7 @@ export function LoginForm({ firebase, history }) {
                     color: "#e91e63",
                     marginLeft: "0.25rem",
                   }}
-                  to="/password"
+                  to="/signup"
                 >
                   Sign up
                 </Link>
