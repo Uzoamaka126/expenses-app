@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { Box, Button, useDisclosure, useToast, Flex } from "@chakra-ui/core";
+import {
+  Box,
+  Button,
+  useDisclosure,
+  useToast,
+  Flex,
+  Text,
+  Image,
+} from "@chakra-ui/core";
 import { ExpensesTable } from "./index";
 import EmptyImage from "../../../assets/empty_page_2.svg";
 import { TableDropdown } from "./components/TableDropdown";
 import { TableRender } from "./Expenses.Table";
 import { getState } from "../../../Utilities/useLocalStorage";
 import { ToastBox, FullPageSpinner, PageHeader, EmptyPage } from "../../UI";
-import { NameFilter } from "./components/Filter";
+import { NameFilter, CategoriesFilter } from "./components/Filter";
+import Search from "../../../assets/search.svg";
 export function ExpensesConsumer({ firebase, history }) {
   const [isLoading, setIsLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(false);
@@ -15,24 +24,29 @@ export function ExpensesConsumer({ firebase, history }) {
   const [expensesData, setExpensesData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategoryTerm, setSearchCategoryTerm] = useState("");
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [showFilter, setShowFilter] = useState(true);
+  const { onClose } = useDisclosure();
   const [add, setAdd] = useState({});
 
   const { uid } = getState();
   const toast = useToast();
 
-  useEffect(() => {
-    handleFetchExpenses(uid);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // useEffect(() => {
+  //   handleFetchExpenses(uid);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
+
+  function handleShowFilters() {
+    setShowFilter(!showFilter);
+  }
 
   function handleSearchNameChange(event) {
     setSearchTerm(event.target.value);
   }
 
-  // function handleSearchCategoryChange(event) {
-  //   setSearchCategoryTerm(event.target.value);
-  // }
+  function handleSearchCategoryChange(event) {
+    setSearchCategoryTerm(event.target.value);
+  }
 
   console.log(expensesData);
 
@@ -99,32 +113,31 @@ export function ExpensesConsumer({ firebase, history }) {
       });
   }
 
+  let results;
   function expensesList() {
     if (searchTerm) {
-      const results = expensesData.filter((item) =>
+      results = expensesData.filter((item) =>
         item.expenses_name.toLowerCase().includes(searchTerm.trim())
       );
       return results;
     }
     if (searchCategoryTerm) {
-      const results = expensesData.filter((item) =>
-        item.category_name.toLowerCase().includes(searchCategoryTerm.trim())
+      results = expensesData.filter((item) =>
+        item.category_name.toLowerCase().includes(searchCategoryTerm)
       );
       return results;
     }
     if (searchTerm && searchCategoryTerm) {
-      const results = expensesData.filter(
-        item =>
-          item.name.toLowerCase().includes(searchTerm.toLocaleLowerCase()) &&
-          item.category
-            .toLowerCase()
-            .includes(searchCategoryTerm)
+      results = expensesData.filter(
+        (item) =>
+          item.expenses_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+          item.category_name.toLowerCase().includes(searchCategoryTerm)
       );
       return results;
     }
     return expensesData;
   }
-  
+
   const columns = React.useMemo(
     () => [
       {
@@ -208,7 +221,12 @@ export function ExpensesConsumer({ firebase, history }) {
             </Flex>
           </Box>
         )}
-        {!expensesList().length ? (
+        {/* if there is no array length and 
+        there is no array of actual expenses and 
+        there is no array of resuts */}
+        {!expensesList().length &&
+        expensesList() !== expensesData &&
+        expensesList() !== results ? (
           <EmptyPage
             heading="You have no expenses"
             subheading="Click the button below to create an expense"
@@ -225,8 +243,90 @@ export function ExpensesConsumer({ firebase, history }) {
               Add new expense
             </Button>
           </EmptyPage>
+        ) : expensesList().length ? (
+          <ExpensesTable data={expensesList()} columns={columns} />
         ) : (
-            <ExpensesTable data={expensesList()} columns={columns} />
+          <Box>
+            <PageHeader
+              handleAddExpense={handleAddExpense}
+              isLoading={isLoading}
+            />
+            <Flex
+              alignItems="center"
+              marginLeft="1rem"
+              justifyContent="space-between"
+            >
+              <Button
+                variantColor="pink"
+                variant="ghost"
+                fontSize="0.8rem"
+                marginLeft="0.1rem"
+                padding="0rem"
+                leftIcon="view-off"
+                onClick={handleShowFilters}
+                _hover={{ background: "transparent" }}
+                _focus={{ border: "none", backgroundColor: "transparent" }}
+                _active={{ border: "none", backgroundColor: "transparent" }}
+              >
+                Hide Filters
+              </Button>
+              <Button
+                variantColor="green"
+                variant="ghost"
+                fontSize="0.8rem"
+                marginLeft="1rem"
+                marginRight="2rem"
+                padding="0rem"
+                leftIcon="external-link"
+                _hover={{ background: "transparent" }}
+                _focus={{ border: "none", backgroundColor: "transparent" }}
+                _active={{ border: "none", backgroundColor: "transparent" }}
+              >
+                Generate Report
+              </Button>
+            </Flex>
+            {!!showFilter && (
+              <div
+                style={
+                  !!showFilter
+                    ? {
+                        paddingLeft: "2rem",
+                        display: "inline-flex",
+                        visibility: "visible",
+                        opacity: 1,
+                        transition: "opacity 2s linear",
+                      }
+                    : {
+                        paddingLeft: "2rem",
+                        display: "inline-flex",
+                        visibility: "hidden",
+                        opacity: 0,
+                        transition: "visibility 0s 2s, opacity 2s linear",
+                      }
+                }
+              >
+                <NameFilter
+                  query={searchTerm}
+                  onChange={handleSearchNameChange}
+                />
+                <CategoriesFilter
+                  query={searchCategoryTerm}
+                  onChange={handleSearchCategoryChange}
+                />
+              </div>
+            )}
+            <Box margin="auto" width="50%" marginTop="5rem" marginBottom="3rem">
+              <Image src={Search} width="300px" height="200px" margin="auto" />
+              <Text
+                fontSize="1.25rem"
+                color="#636363"
+                textAlign="center"
+                marginTop="1rem"
+              >
+                No match for your search
+              </Text>
+            </Box>
+          </Box>
         )}
       </Box>
     </Box>
