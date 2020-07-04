@@ -16,20 +16,8 @@ import {
 import React from "react";
 import { ModalContainer } from "../../../UI/ModalContainer";
 // import { getState } from "../../../../Utilities/useLocalStorage";
+import { categories } from './data'
 
-const categories = [
-  "Apps",
-  "Donations",
-  "Entertainment",
-  "Family & Friends",
-  "Food",
-  "Games",
-  "Media Subscriptions",
-  "Outings",
-  "Partners",
-  "Skincare",
-  "Transport",
-];
 export function EditExpenseModal({
   isOpen,
   onClose,

@@ -1,5 +1,20 @@
 import React from "react";
 import { Box, Input, FormControl, FormLabel, Select } from "@chakra-ui/core";
+
+const categories = [
+  "All Categories",
+  "Apps",
+  "Donations",
+  "Entertainment",
+  "Family & Friends",
+  "Food",
+  "Games",
+  "Media Subscriptions",
+  "Outings",
+  "Partners",
+  "Skincare",
+  "Transport",
+];
 export function DateFilters() {
   return <Box></Box>;
 }
@@ -26,19 +41,6 @@ export function NameFilter({ query, onChange }) {
 }
 
 export function CategoriesFilter({ query, onChange }) {
-  const categories = [
-    "Apps",
-    "Donations",
-    "Entertainment",
-    "Family & Friends",
-    "Food",
-    "Games",
-    "Media Subscriptions",
-    "Outings",
-    "Partners",
-    "Skincare",
-    "Transport",
-  ];
   return (
     <FormControl marginBottom="1rem" marginTop="1rem" marginLeft="1.5rem">
       <FormLabel marginBottom="0rem" fontSize="0.8rem" color="#636363">

@@ -31,10 +31,10 @@ export function ExpensesConsumer({ firebase, history }) {
   const { uid } = getState();
   const toast = useToast();
 
-  // useEffect(() => {
-  //   handleFetchExpenses(uid);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
+  useEffect(() => {
+    handleFetchExpenses(uid);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function handleShowFilters() {
     setShowFilter(!showFilter);
@@ -47,8 +47,6 @@ export function ExpensesConsumer({ firebase, history }) {
   function handleSearchCategoryChange(event) {
     setSearchCategoryTerm(event.target.value);
   }
-
-  console.log(expensesData);
 
   function handleDeleteExpense(id) {
     // setIsDeleteLoading(true);
@@ -121,11 +119,15 @@ export function ExpensesConsumer({ firebase, history }) {
       );
       return results;
     }
-    if (searchCategoryTerm) {
+    if (searchCategoryTerm && searchCategoryTerm !== "All Categories") {
       results = expensesData.filter((item) =>
-        item.category_name.toLowerCase().includes(searchCategoryTerm)
+        item.category_name.includes(searchCategoryTerm)
       );
       return results;
+    }
+    if (searchCategoryTerm === "All Categories") {
+      console.log(searchCategoryTerm);
+      return expensesData;
     }
     if (searchTerm && searchCategoryTerm) {
       results = expensesData.filter(
@@ -207,20 +209,76 @@ export function ExpensesConsumer({ firebase, history }) {
   return (
     <Box>
       <Box>
-        {!!expensesList().length && (
-          <Box>
-            <PageHeader
-              handleAddExpense={handleAddExpense}
-              isLoading={isLoading}
-            />
-            <Flex>
+        <Box>
+          <PageHeader
+            handleAddExpense={handleAddExpense}
+            isLoading={isLoading}
+          />
+          <Flex
+            alignItems="center"
+            marginLeft="1rem"
+            justifyContent="space-between"
+          >
+            <Button
+              variantColor="pink"
+              variant="ghost"
+              fontSize="0.8rem"
+              marginLeft="0.1rem"
+              padding="0rem"
+              leftIcon="view-off"
+              onClick={handleShowFilters}
+              _hover={{ background: "transparent" }}
+              _focus={{ border: "none", backgroundColor: "transparent" }}
+              _active={{ border: "none", backgroundColor: "transparent" }}
+            >
+              Hide Filters
+            </Button>
+            <Button
+              variantColor="green"
+              variant="ghost"
+              fontSize="0.8rem"
+              marginLeft="1rem"
+              marginRight="2rem"
+              padding="0rem"
+              leftIcon="external-link"
+              _hover={{ background: "transparent" }}
+              _focus={{ border: "none", backgroundColor: "transparent" }}
+              _active={{ border: "none", backgroundColor: "transparent" }}
+            >
+              Generate Report
+            </Button>
+          </Flex>
+          {!!showFilter && (
+            <div
+              style={
+                !!showFilter
+                  ? {
+                      paddingLeft: "2rem",
+                      display: "inline-flex",
+                      visibility: "visible",
+                      opacity: 1,
+                      transition: "opacity 2s linear",
+                    }
+                  : {
+                      paddingLeft: "2rem",
+                      display: "inline-flex",
+                      visibility: "hidden",
+                      opacity: 0,
+                      transition: "visibility 0s 2s, opacity 2s linear",
+                    }
+              }
+            >
               <NameFilter
                 query={searchTerm}
                 onChange={handleSearchNameChange}
               />
-            </Flex>
-          </Box>
-        )}
+              <CategoriesFilter
+                query={searchCategoryTerm}
+                onChange={handleSearchCategoryChange}
+              />
+            </div>
+          )}
+        </Box>
         {/* if there is no array length and 
         there is no array of actual expenses and 
         there is no array of resuts */}
@@ -247,74 +305,6 @@ export function ExpensesConsumer({ firebase, history }) {
           <ExpensesTable data={expensesList()} columns={columns} />
         ) : (
           <Box>
-            <PageHeader
-              handleAddExpense={handleAddExpense}
-              isLoading={isLoading}
-            />
-            <Flex
-              alignItems="center"
-              marginLeft="1rem"
-              justifyContent="space-between"
-            >
-              <Button
-                variantColor="pink"
-                variant="ghost"
-                fontSize="0.8rem"
-                marginLeft="0.1rem"
-                padding="0rem"
-                leftIcon="view-off"
-                onClick={handleShowFilters}
-                _hover={{ background: "transparent" }}
-                _focus={{ border: "none", backgroundColor: "transparent" }}
-                _active={{ border: "none", backgroundColor: "transparent" }}
-              >
-                Hide Filters
-              </Button>
-              <Button
-                variantColor="green"
-                variant="ghost"
-                fontSize="0.8rem"
-                marginLeft="1rem"
-                marginRight="2rem"
-                padding="0rem"
-                leftIcon="external-link"
-                _hover={{ background: "transparent" }}
-                _focus={{ border: "none", backgroundColor: "transparent" }}
-                _active={{ border: "none", backgroundColor: "transparent" }}
-              >
-                Generate Report
-              </Button>
-            </Flex>
-            {!!showFilter && (
-              <div
-                style={
-                  !!showFilter
-                    ? {
-                        paddingLeft: "2rem",
-                        display: "inline-flex",
-                        visibility: "visible",
-                        opacity: 1,
-                        transition: "opacity 2s linear",
-                      }
-                    : {
-                        paddingLeft: "2rem",
-                        display: "inline-flex",
-                        visibility: "hidden",
-                        opacity: 0,
-                        transition: "visibility 0s 2s, opacity 2s linear",
-                      }
-                }
-              >
-                <NameFilter
-                  query={searchTerm}
-                  onChange={handleSearchNameChange}
-                />
-                <CategoriesFilter
-                  query={searchCategoryTerm}
-                  onChange={handleSearchCategoryChange}
-                />
-              </div>
-            )}
             <Box margin="auto" width="50%" marginTop="5rem" marginBottom="3rem">
               <Image src={Search} width="300px" height="200px" margin="auto" />
               <Text
