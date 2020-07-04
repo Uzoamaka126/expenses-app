@@ -11,7 +11,7 @@ import {
   useToast,
   useDisclosure,
 } from "@chakra-ui/core";
-import { ToastBox } from "../../ToastBox";
+import { ToastBox } from "../../UI";
 import { SignupSuccess } from "./SignupSuccess";
 import { setState } from "../../../Utilities/useLocalStorage";
 

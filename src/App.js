@@ -5,7 +5,7 @@ import { customTheme } from "./Components/Styles/GlobalTheme";
 import Login from "./Components/PublicApp/Login/Login";
 import Signup from "./Components/PublicApp/Signup/Signup";
 import ProtectedApp from "./Components/ProtectedApp";
-import { NotFound } from "./Components/ErrorPage";
+import { NotFound } from "./Components/UI";
 
 function App(props) {
   return (

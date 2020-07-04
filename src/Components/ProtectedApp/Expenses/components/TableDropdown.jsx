@@ -15,7 +15,7 @@ import {
 } from "@chakra-ui/core";
 import React, { useState } from "react";
 import { EditExpenseModal } from "./EditExpenseModal";
-import { ToastBox } from "../../../ToastBox";
+import { ToastBox } from "../../../UI";
 import { getState } from "../../../../Utilities/useLocalStorage";
 
 export function TableDropdown({ data, id, handleDeleteExpense, firebase, handleFetchExpenses }) {

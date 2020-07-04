@@ -1,16 +1,15 @@
 import React from "react";
-// import { Link as RouterLink } from "react-router-dom";
 // import checkmark from "../../../Components/assets/tick.svg";
 import {
   Button,
   Box,
-//   Image,
+  //   Image,
   Text,
   Heading,
   Flex,
   ModalBody,
 } from "@chakra-ui/core";
-import { ModalContainer } from "../../ModalContainer";
+import { ModalContainer } from "../../UI";
 
 export function SignupSuccess({ history, isOpen, onClose }) {
   function goToDashboard() {
@@ -18,7 +17,12 @@ export function SignupSuccess({ history, isOpen, onClose }) {
   }
 
   return (
-    <ModalContainer isOpen={isOpen} onClose={onClose} initialFocusRef>
+    <ModalContainer
+      showCloseButton
+      isOpen={isOpen}
+      onClose={onClose}
+      initialFocusRef
+    >
       <ModalBody>
         <Flex
           width="fit-content"

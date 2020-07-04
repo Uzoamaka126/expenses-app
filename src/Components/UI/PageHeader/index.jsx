@@ -7,7 +7,7 @@ import {
   Button,
   useDisclosure,
 } from "@chakra-ui/core";
-import { CreateNewExpenseModal } from "../ProtectedApp/Expenses/components/AddNewExpenseModal";
+import { CreateNewExpenseModal } from "../../ProtectedApp/Expenses/components/AddNewExpenseModal";
 
 export function PageHeader({ handleAddExpense, isLoading }) {
   const { onClose, onOpen, isOpen } = useDisclosure();

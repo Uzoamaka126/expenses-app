@@ -10,7 +10,7 @@ import {
   //   FormErrorMessage,
   useToast,
 } from "@chakra-ui/core";
-import { ToastBox } from "../../ToastBox";
+import { ToastBox } from "../../UI/ToastBox";
 import { setState } from "../../../Utilities/useLocalStorage";
 
 export function LoginForm({ firebase, history }) {

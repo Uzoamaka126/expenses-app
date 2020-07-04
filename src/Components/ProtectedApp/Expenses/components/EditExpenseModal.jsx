@@ -14,8 +14,8 @@ import {
   Text,
 } from "@chakra-ui/core";
 import React from "react";
-import { ModalContainer } from "../../../ModalContainer";
-import { getState } from "../../../../Utilities/useLocalStorage";
+import { ModalContainer } from "../../../UI/ModalContainer";
+// import { getState } from "../../../../Utilities/useLocalStorage";
 
 const categories = [
   "Apps",

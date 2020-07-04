@@ -4,8 +4,8 @@ import { Dashboard } from "./Dashboard";
 import { Onboarding } from "./Onboarding";
 import ProtectedRoute from "../../Utilities/ProtectedRoute";
 import { FirebaseContext } from "../../Utilities/Firebase";
-import { NotFound } from "../ErrorPage";
 import { ExpensesContextProvider } from "./Expenses";
+import { NotFound } from "../UI";
 export default function ProtectedApp(props) {
   return (
     <FirebaseContext.Consumer>

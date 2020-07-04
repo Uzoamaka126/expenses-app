@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { Box, Button, useDisclosure, useToast } from "@chakra-ui/core";
+import { Box, Button, useDisclosure, useToast, Flex } from "@chakra-ui/core";
 import { ExpensesTable } from "./index";
-import { EmptyPage, PageHeader } from "../../index";
 import EmptyImage from "../../../assets/empty_page_2.svg";
 import { TableDropdown } from "./components/TableDropdown";
 import { TableRender } from "./Expenses.Table";
 import { getState } from "../../../Utilities/useLocalStorage";
-import { ToastBox } from "../../ToastBox";
-import { FullPageSpinner } from "../../FullPageSpinner";
+import { ToastBox, FullPageSpinner, PageHeader, EmptyPage } from "../../UI";
+import { NameFilter } from "./components/Filter";
 export function ExpensesConsumer({ firebase, history }) {
   const [isLoading, setIsLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(false);
-  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  // const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [expensesData, setExpensesData] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchCategoryTerm, setSearchCategoryTerm] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [add, setAdd] = useState({});
 
@@ -21,16 +22,22 @@ export function ExpensesConsumer({ firebase, history }) {
   const toast = useToast();
 
   useEffect(() => {
-    if (uid) {
-      handleFetchExpenses(uid);
-    }
+    handleFetchExpenses(uid);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uid]);
+  }, []);
+
+  function handleSearchNameChange(event) {
+    setSearchTerm(event.target.value);
+  }
+
+  // function handleSearchCategoryChange(event) {
+  //   setSearchCategoryTerm(event.target.value);
+  // }
 
   console.log(expensesData);
 
   function handleDeleteExpense(id) {
-    setIsDeleteLoading(true);
+    // setIsDeleteLoading(true);
     firebase
       .doDeleteUserExpense(id)
       .then(() => {
@@ -38,8 +45,8 @@ export function ExpensesConsumer({ firebase, history }) {
           const updatedArray = expensesData.filter((item) => item.id !== id);
           setExpensesData(updatedArray);
         }
-        setIsDeleteLoading(false);
-        handleFetchExpenses(uid)
+        // setIsDeleteLoading(false);
+        handleFetchExpenses(uid);
         toast({
           position: "bottom-left",
           render: () => <ToastBox message="Expense deleted" />,
@@ -47,7 +54,7 @@ export function ExpensesConsumer({ firebase, history }) {
         onClose();
       })
       .catch((error) => {
-        setIsDeleteLoading(false);
+        // setIsDeleteLoading(false);
         toast({
           position: "bottom-left",
           render: () => <ToastBox message={error} />,
@@ -92,6 +99,32 @@ export function ExpensesConsumer({ firebase, history }) {
       });
   }
 
+  function expensesList() {
+    if (searchTerm) {
+      const results = expensesData.filter((item) =>
+        item.expenses_name.toLowerCase().includes(searchTerm.trim())
+      );
+      return results;
+    }
+    if (searchCategoryTerm) {
+      const results = expensesData.filter((item) =>
+        item.category_name.toLowerCase().includes(searchCategoryTerm.trim())
+      );
+      return results;
+    }
+    if (searchTerm && searchCategoryTerm) {
+      const results = expensesData.filter(
+        item =>
+          item.name.toLowerCase().includes(searchTerm.toLocaleLowerCase()) &&
+          item.category
+            .toLowerCase()
+            .includes(searchCategoryTerm)
+      );
+      return results;
+    }
+    return expensesData;
+  }
+  
   const columns = React.useMemo(
     () => [
       {
@@ -161,13 +194,21 @@ export function ExpensesConsumer({ firebase, history }) {
   return (
     <Box>
       <Box>
-        {!!expensesData.length && (
-          <PageHeader
-            handleAddExpense={handleAddExpense}
-            isLoading={isLoading}
-          />
+        {!!expensesList().length && (
+          <Box>
+            <PageHeader
+              handleAddExpense={handleAddExpense}
+              isLoading={isLoading}
+            />
+            <Flex>
+              <NameFilter
+                query={searchTerm}
+                onChange={handleSearchNameChange}
+              />
+            </Flex>
+          </Box>
         )}
-        {!expensesData.length ? (
+        {!expensesList().length ? (
           <EmptyPage
             heading="You have no expenses"
             subheading="Click the button below to create an expense"
@@ -185,7 +226,7 @@ export function ExpensesConsumer({ firebase, history }) {
             </Button>
           </EmptyPage>
         ) : (
-          <ExpensesTable data={expensesData} columns={columns} />
+            <ExpensesTable data={expensesList()} columns={columns} />
         )}
       </Box>
     </Box>

@@ -3,7 +3,6 @@ import { Flex } from "@chakra-ui/core";
 import { Content, SideBar } from "./Components";
 import { clearAppState, getState } from "../../../Utilities/useLocalStorage";
 
-
 const menuList = [
   { title: "Onboarding", url: "/dashboard/onboarding" },
   { title: "Expenses", url: "/dashboard/expenses" },
