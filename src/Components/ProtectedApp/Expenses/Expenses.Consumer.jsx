@@ -17,6 +17,9 @@ import { getState } from "../../../Utilities/useLocalStorage";
 import { ToastBox, FullPageSpinner, PageHeader, EmptyPage } from "../../UI";
 import { NameFilter, CategoriesFilter } from "./components/Filter";
 import Search from "../../../assets/search.svg";
+import { CustomAlert } from "./components/CustomAlerts";
+
+
 export function ExpensesConsumer({ firebase, history }) {
   const [isLoading, setIsLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(false);
@@ -25,6 +28,7 @@ export function ExpensesConsumer({ firebase, history }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchCategoryTerm, setSearchCategoryTerm] = useState("");
   const [showFilter, setShowFilter] = useState(true);
+  const [maxExpense, setMaxExpense] = useState({});
   const { onClose } = useDisclosure();
   const [add, setAdd] = useState({});
 
@@ -119,7 +123,11 @@ export function ExpensesConsumer({ firebase, history }) {
       );
       return results;
     }
-    if (searchCategoryTerm && searchCategoryTerm !== "All Categories") {
+    if (
+      !searchTerm &&
+      searchCategoryTerm &&
+      searchCategoryTerm !== "All Categories"
+    ) {
       results = expensesData.filter((item) =>
         item.category_name.includes(searchCategoryTerm)
       );
@@ -135,9 +143,18 @@ export function ExpensesConsumer({ firebase, history }) {
           item.expenses_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
           item.category_name.toLowerCase().includes(searchCategoryTerm)
       );
-      return results;
+      if (results) return results;
     }
     return expensesData;
+  }
+
+  function handleCustomAlerts() {
+    // find a way to get the max amount of an expense object from that new array;
+    const maxExpenseAmountObj = expensesData.reduce(function (prev, current) {
+      return prev.y > current.y ? prev : current;
+    });
+    // the above returns an object with the highest amount
+    return maxExpenseAmountObj;
   }
 
   const columns = React.useMemo(
@@ -208,6 +225,7 @@ export function ExpensesConsumer({ firebase, history }) {
 
   return (
     <Box>
+      <CustomAlert maxObj={handleCustomAlerts} />
       <Box>
         <Box>
           <PageHeader
